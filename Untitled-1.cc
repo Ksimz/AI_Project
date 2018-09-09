@@ -6,6 +6,9 @@
 #include <string>
 #include <cstdlib>
 #include <math.h>
+#include <fstream>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace std;
 
@@ -18,6 +21,7 @@ int ***ptr;
 int **zan;
 int ldp_x_y;
 int *temp;
+int *tech1;
 
 void Directional_Response(void){
 
@@ -118,13 +122,6 @@ void Liner_Dir_Pat(void)
                 for(int j=0;j<9;j++)
                 {
                         int maxVal=0;
-                        for(int n=0;n<7;n++)
-                        {
-                                if((ptr[i][j][n])>maxVal)
-                                {
-                                        maxVal=ptr[i][j][n];
-                                }
-                        }
                         ldp_x_y=0;
                         temp=new int[7];
                         for(int n=0;n<7;n++)
@@ -149,6 +146,7 @@ void Liner_Dir_Pat(void)
                                      }
                                 ldp_x_y=ldp_x_y+(value*(pow(2,m)));
                         }
+                
 
                         zan[i][j]=ldp_x_y;
                 }
@@ -181,9 +179,56 @@ void bubbleSort(int arr[])
    }
 }
 
+void Histogram()
+{
+        int value1;
+        tech1=new int[56];
+        delete[] ptr;
+       for(int m=0;m<56;m++)
+        {
+           tech1[m]=0;
+        }
+
+        for(int t=0;t<=56;t++)
+        {
+                for(int i=0;i<9;i++)
+                {
+                        for(int j=0;j<9;j++)
+                        {
+                                if(zan[i][j]==t)
+                                {
+                                 value1=1;
+                                }
+                                else{
+                                        value1=0;
+                                }
+                                tech1[t]=tech1[t]+value1;
+                        }
+                }
+                cout<<" Result "<<"["<<"\n";
+                for(int k=0;k<56;k++)
+                {
+                        cout<<tech1[k]<<",";
+                }
+                cout<<"]"<<"\n";
+        }
+        ofstream myfile("result.txt",ios::out|ios::app);
+        if(myfile.is_open())
+        {
+                for(int k=0;k<56;k++)
+                {
+                        myfile<<tech1[k]<<",";
+                }  
+                myfile<<"\n";  
+        }
+        else{
+            cout<<"Could not open file"<<"\n";
+        }
+}   
+
 int main(void)
 {
-         Create_LDP_Mat();
+     Create_LDP_Mat();
      Directional_Response();
 
          cout<<"[";
@@ -202,7 +247,8 @@ int main(void)
                  cout<<"\n";
          }
          cout<<"]";
-         system("pause");
+         Liner_Dir_Pat();
+
 
          cout<<"Printing the LDP Matrix"<<endl;
          cout<<"[";
@@ -215,7 +261,11 @@ int main(void)
                  cout<<"\n";
          }
          cout<<"]";
-         system("pause");
+         cout<<"\n"<<"\n"<<"\n";
+         Histogram();
+
+         cout<<"done";
+        
 
          return 0;
 
